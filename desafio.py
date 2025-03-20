@@ -1,17 +1,3 @@
-"""Implemente um decorador que seja aplicado a todas as funções de transações bancárias
-(depósito, saque, criação de conta, etc). Esse decorador deve registrar (printar)
-a data e hora de cada transação, bem como o tipo de transação."""
-
-"""Crie um gerador que permita iterar sobre as transações de uma conta e retorne,
-uma a uma, as transações que foram realizadas.
-Esse gerador deve ter, também, uma forma de filtrar as transações baseado em seu tipo
-(por exemplo, apenas saques ou apenas depósitos)."""
-
-"""Implemente um iterador personalizado ContaIterador
-Que permita iterar sobre todas as contas do banco,
-retornando informações básicas de cada conta
-(número, saldo atual, etc)"""
-
 import textwrap
 from abc import ABC, abstractclassmethod, abstractproperty
 from datetime import datetime
