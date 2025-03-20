@@ -204,7 +204,14 @@ class Deposito(Transacao):
 
 
 def log_transacao(func):
-    pass
+    def envelope(*args, **kwargs):
+        print(f'\033[36m[LOG - {datetime.now()}]\033[32m Executando: {func.__name__}\033[m')
+        resultado = func(*args, **kwargs)
+        print(f'\033[36m[LOG - {datetime.now()}]\033[31m Finalizando: {func.__name__}\033[m')
+
+        return resultado
+
+    return envelope
 
 
 def menu():
