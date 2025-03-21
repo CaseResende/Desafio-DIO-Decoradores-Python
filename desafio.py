@@ -5,13 +5,20 @@ from datetime import datetime
 
 class ContaIterador:
     def __init__(self, contas):
-        pass
+        self.contas = contas
+        self.indice = 0
 
     def __iter__(self):
-        pass
+        return self
 
     def __next__(self):
-        pass
+        if self.indice >= len(self.contas):
+            raise StopIteration
+
+        conta = self.contas[self.indice]
+        self.indice += 1
+
+        return f'Conta: {conta.numero}, Agência: {conta.agencia}, Titular: {conta.cliente.nome}, Saldo: R${conta.saldo:.2f}'
 
 
 class Cliente:
@@ -140,12 +147,14 @@ class Historico:
             {
                 "tipo": transacao.__class__.__name__,
                 "valor": transacao.valor,
-                "data": datetime.now().strftime("%d-%m-%Y %H:%M:%s"),
+                "data": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             }
         )
 
     def gerar_relatorio(self, tipo_transacao=None):
-        pass
+        for transacao in self._transacoes:
+            if tipo_transacao is None or transacao["tipo"] == tipo_transacao:
+                yield transacao
 
 
 class Transacao(ABC):
@@ -191,9 +200,9 @@ class Deposito(Transacao):
 
 def log_transacao(func):
     def envelope(*args, **kwargs):
-        print(f'\033[36m[LOG - {datetime.now()}]\033[32m Executando: {func.__name__}\033[m')
+        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[32m Executando: {func.__name__}\033[m')
         resultado = func(*args, **kwargs)
-        print(f'\033[36m[LOG - {datetime.now()}]\033[31m Finalizando: {func.__name__}\033[m')
+        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[31m Finalizando: {func.__name__}\033[m')
 
         return resultado
 
@@ -280,15 +289,19 @@ def exibir_extrato(clientes):
         return
 
     print("\n================ EXTRATO ================")
-    # TODO: atualizar a implementação para utilizar o gerador definido em Historico
-    transacoes = conta.historico.transacoes
+    tipo = input("Deseja filtrar por tipo de transação? (Digite 'Saque', 'Deposito' ou deixe em branco para todas): ")
+    tipo = tipo if tipo in ["Saque", "Deposito"] else None
+
+    transacoes = conta.historico.gerar_relatorio(tipo)
 
     extrato = ""
-    if not transacoes:
-        extrato = "Não foram realizadas movimentações."
-    else:
-        for transacao in transacoes:
-            extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}"
+    encontrou = False
+    for transacao in transacoes:
+        encontrou = True
+        extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f} em {transacao['data']}"
+
+    if not encontrou:
+        extrato = "Não foram realizadas movimentações desse tipo."
 
     print(extrato)
     print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
@@ -332,10 +345,9 @@ def criar_conta(numero_conta, clientes, contas):
 
 
 def listar_contas(contas):
-    # TODO: alterar implementação, para utilizar a classe ContaIterador
-    for conta in contas:
+    for info_conta in ContaIterador(contas):
         print("=" * 100)
-        print(textwrap.dedent(str(conta)))
+        print(info_conta)
 
 
 def main():
