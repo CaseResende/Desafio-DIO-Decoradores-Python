@@ -200,9 +200,9 @@ class Deposito(Transacao):
 
 def log_transacao(func):
     def envelope(*args, **kwargs):
-        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[32m Executando: {func.__name__}\033[m')
+        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[32m Executando: {func.__name__.upper()}\033[m')
         resultado = func(*args, **kwargs)
-        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[31m Finalizando: {func.__name__}\033[m')
+        print(f'\033[36m[LOG - {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}]\033[31m Finalizando: {func.__name__.upper()}\033[m')
 
         return resultado
 
@@ -212,13 +212,13 @@ def log_transacao(func):
 def menu():
     menu = """\n
     ================ MENU ================
-    [d]\tDepositar
-    [s]\tSacar
-    [e]\tExtrato
-    [nc]\tNova conta
-    [lc]\tListar contas
-    [nu]\tNovo usuário
-    [q]\tSair
+    [d]  Depositar
+    [s]  Sacar
+    [e]  Extrato
+    [nc] Nova conta
+    [lc] Listar contas
+    [nu] Novo usuário
+    [q]  Sair
     => """
     return input(textwrap.dedent(menu))
 
@@ -298,7 +298,7 @@ def exibir_extrato(clientes):
     encontrou = False
     for transacao in transacoes:
         encontrou = True
-        extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f} em {transacao['data']}"
+        extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f} em \033[36m{transacao['data']}\033[m"
 
     if not encontrou:
         extrato = "Não foram realizadas movimentações desse tipo."
